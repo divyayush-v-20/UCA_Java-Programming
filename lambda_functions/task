@@ -1,0 +1,5 @@
+1. input - int, output - square of int
+2. input - str, output - uppercase
+3. input - str, output - execute trim() - > remove whitespaces from start and end
+4. function -> supplier, consumer
+	supplier - random UID, consumer prints it 10 times in interval of 2 seconds
