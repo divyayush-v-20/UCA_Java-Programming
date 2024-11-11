@@ -1,4 +1,5 @@
 // find the longest sequence with AND >= 1
+// leetcode 2275
 public class maxLengthAND{
     public int solve(int arr[]){
         int res = 0;
