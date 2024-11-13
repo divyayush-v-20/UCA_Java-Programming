@@ -1,49 +1,32 @@
-//implement floor, ceil, size, rank
-import java.util.*;
+// CEIL, FLOOR, SIZE, RANK
 
 public class BinarySearchTree{
+
     class TreeNode{
         int key;
         int val;
+        int size;
         TreeNode left;
         TreeNode right;
-        int size;
         TreeNode(int key, int val){
             this.key = key;
             this.val = val;
+            this.size = 1;
             this.left = null;
             this.right = null;
-            this.size = 1;
         }
     }
-    class Pair{
-        TreeNode ceil;
-        TreeNode floor;
-        Pair(TreeNode c, TreeNode f){
-            this.ceil = c;
-            this.floor = f;
-        }
-    }
+
     private TreeNode root;
 
-    private int getSize(TreeNode node){
-        if(node == null) return 0;
-        return node.size;
-    }
-    private TreeNode insert(TreeNode root, int key, int val){
+    private Integer getSize(TreeNode root){
         if(root == null){
-            return new TreeNode(key, val);
+            return 0;
         }
-        if(root.key > key){
-            root.left = insert(root.left, key, val);
-        }
-        if(root.key < key){
-            root.right = insert(root.right, key, val);
-        }
-        root.size = getSize(root.left) + getSize(root.right) + 1;
-        return root;
+        return root.size;
     }
-    private Integer extract(TreeNode root, int key){
+
+    private Integer search(TreeNode root, int key){
         TreeNode cur = root;
         while(cur != null){
             if(cur.key == key){
@@ -58,47 +41,86 @@ public class BinarySearchTree{
         }
         return null;
     }
-    public Integer get(int key){
-        Integer res = extract(root, key);
-        if(res != null) return res;
-        return -1;
+
+    private TreeNode insert(TreeNode root, int key, int val){
+        if(root == null){
+            return new TreeNode(key, val);
+        }
+        if(root.key == key){
+            root.val = val;
+        }
+        else if(root.key > key){
+            root.left = insert(root.left, key, val);
+        }
+        else{
+            root.right = insert(root.right, key, val);
+        }
+        root.size = 1 + getSize(root.left) + getSize(root.right);
+        return root;
     }
-    public void put(int key, int val){
-        root = insert(root, key, val);
-    }
-    public int getSize(){
-        return getSize(root);
-    }
-    public Pair getCeilandFloor(int key){
+
+    public Integer getCeil(int key){
+        Integer res = null;
         TreeNode cur = root;
-        TreeNode floor = null;
-        TreeNode ceil = null;
         while(cur != null){
-            if(cur.key == key){
-                return new Pair(cur, cur);
+            if(cur.key == key) {
+                return key;
             }
             else if(cur.key > key){
-                ceil = cur;
+                res = cur.key;
                 cur = cur.left;
             }
             else{
-                floor = cur;
                 cur = cur.right;
             }
         }
-        return new Pair(ceil, floor);
+        return res;
+    }
+
+    public Integer getFloor(int key){
+        Integer res = null;
+        TreeNode cur = root;
+        while(cur != null){
+            if(cur.key == key) {
+                return key;
+            }
+            else if(cur.key > key){
+                cur = cur.left;
+            }
+            else{
+                res = cur.key;
+                cur = cur.right;
+            }
+        }
+        return res;
+    }
+
+    public Integer getSize(){
+        return getSize(root);
+    }
+
+    public void put(int key, int val){
+        root = insert(root, key, val);
+    }
+
+    public Integer get(int key){
+        return search(root, key);
     }
 
     public static void main(String[] args){
         BinarySearchTree bst = new BinarySearchTree();
-        bst.put(3, 1);
-        bst.put(7, 6);
-        bst.put(2, 3);
-        bst.put(1, 7);
+        
+        bst.put(7, 1);
+        bst.put(4, 2);
+        bst.put(10, 3);
+        bst.put(2, 4);
+        bst.put(3, 5);
+        bst.put(9, 6);
+        bst.put(13, 7);
+        bst.put(8, 8);
 
-        System.out.println(bst.getSize());
+        System.out.println("No. of nodes = " + bst.getSize());
+        System.out.println("Ceil of 5: " + bst.getCeil(5) + ", Floor of 5: " + bst.getFloor(5));
 
-        Pair res = bst.getCeilandFloor(5);
-        System.out.println(res.ceil.key + " " + res.floor.key);
     }
 }
