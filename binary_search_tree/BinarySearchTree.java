@@ -59,6 +59,15 @@ public class BinarySearchTree{
         return root;
     }
 
+    private void inorder(TreeNode root){
+        if(root == null){
+            return;
+        }
+        inorder(root.left);
+        System.out.print(root.key + " ");
+        inorder(root.right);
+    }
+
     public Integer getCeil(int key){
         Integer res = null;
         TreeNode cur = root;
@@ -107,6 +116,31 @@ public class BinarySearchTree{
         return search(root, key);
     }
 
+    public Integer getRank(int key){
+        int rank = 1;
+        TreeNode cur = root;
+        while(cur != null){
+            if(key < cur.key){
+                cur = cur.left;
+            }
+            else if(key > cur.key){
+                rank += getSize(cur.left) + 1;
+                cur = cur.right;
+            }
+            else{
+                rank += getSize(cur.left);
+                return rank;
+            }
+        }
+        return null;
+    }
+
+    public void printInorder(){
+        System.out.println("Inorder Traversal of the BST is as follows: ");
+        inorder(root);
+        System.out.println();
+    }
+
     public static void main(String[] args){
         BinarySearchTree bst = new BinarySearchTree();
         
@@ -120,7 +154,15 @@ public class BinarySearchTree{
         bst.put(8, 8);
 
         System.out.println("No. of nodes = " + bst.getSize());
+
+        System.out.println("Ceil of 11: " + bst.getCeil(11) + ", Floor of 11: " + bst.getFloor(11));
         System.out.println("Ceil of 5: " + bst.getCeil(5) + ", Floor of 5: " + bst.getFloor(5));
+
+        bst.printInorder();
+
+        System.out.println("Rank of 8 = " + bst.getRank(8));
+        System.out.println("Rank of 3 = " + bst.getRank(3));
+        System.out.println("Rank of 2 = " + bst.getRank(2));
 
     }
 }
