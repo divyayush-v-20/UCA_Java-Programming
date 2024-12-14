@@ -1,57 +1,112 @@
-public class Trie<Value>{
-
-    private static final int R = 128;
-    private Node root;
-
-    private static class Node{
-        Object val;
-        Node[] next = new Node[R];
-    }
-
-    public Value get(String key){
-        Node x = get(root, key, 0);
-        if(x == null) return null;
-        return (Value)x.val;
-    }
-
-    private Node get(Node x, String key, int d){
-        if(x == null)  return null;
-        if(key.length() == d) return x;
-
-        char c = key.charAt(d);
-        return get(x.next[c], key, d + 1);
-    }
-
-    public void put(String key, Value val){
-        root = put(root, key, val, 0);
-    }
-
-    private Node put(Node x, String key, Value val, int d){
-        if(x == null) x = new Node();
-        if(key.length() == d) {
-            x.val = val;
-            return x;
+public class Trie {
+    class Node {
+        char data;
+        Node[] children;
+        boolean isEnd;
+        
+        Node(char c) {
+            this.data = c;
+            this.children = new Node[26];
+            this.isEnd = false;
         }
-
-        char c = key.charAt(d);
-        x.next[c] = put(x.next[c], key, val, d + 1);
-
-        return x;
     }
-
-    public static void main(String[] args){
-        Trie<Integer> trie = new Trie<Integer>();
-
-        //testcases
-        trie.put("hello", 1);
-        trie.put("hell", 2);
-
-        assert trie.get("he") == null;
-        assert trie.get("hello") == 1;
-        assert trie.get("hell") == 3;
-
-        // java -ea Trie -> to run with Assertions
-        // ea: Enable Assertions
-
+    
+    Node root;
+    
+    Trie() {
+        this.root = new Node('\0');
+    }
+    
+    void insertHelper(Node root, String word) {
+        if (word.length() == 0) {
+            root.isEnd = true;
+            return;
+        }
+        
+        int idx = word.charAt(0) - 'a';
+        Node child;
+        
+        if (root.children[idx] != null) {
+            child = root.children[idx];
+        } else {
+            child = new Node(word.charAt(0));
+            root.children[idx] = child;
+        }
+        
+        insertHelper(child, word.substring(1));
+    }
+    
+    boolean searchHelper(Node root, String word) {
+        if (word.length() == 0) {
+            return root.isEnd;
+        }
+        
+        int idx = word.charAt(0) - 'a';
+        Node child;
+        
+        if (root.children[idx] != null) {
+            child = root.children[idx];
+        } else {
+            return false;
+        }
+        
+        return searchHelper(child, word.substring(1));
+    }
+    
+    boolean allChildrenNull(Node root) {
+        for (int i = 0; i < 26; i++) {
+            if (root.children[i] != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    boolean removeHelper(Node root, String word) {
+        if (word.length() == 0) {
+            if (root.isEnd) {
+                root.isEnd = false;
+            }
+            return !root.isEnd && allChildrenNull(root);
+        }
+        
+        int idx = word.charAt(0) - 'a';
+        Node child = root.children[idx];
+        
+        if (child == null) {
+            return false;
+        }
+        
+        boolean removeChild = removeHelper(child, word.substring(1));
+        
+        if (removeChild) {
+            root.children[idx] = null;
+            return !root.isEnd && allChildrenNull(root);
+        }
+        
+        return false;
+    }
+    
+    void insertWord(String word) {
+        insertHelper(root, word);
+    }
+    
+    boolean searchWord(String word) {
+        return searchHelper(root, word);
+    }
+    
+    void removeWord(String word) {
+        removeHelper(root, word);
+    }
+    
+    public static void main(String[] args) {
+        Trie t = new Trie();
+        t.insertWord("time");
+        t.insertWord("timer");
+        assert t.searchWord("time") == true;
+        assert t.searchWord("timer") == true;
+        assert t.searchWord("tim") == false;
+        t.removeWord("time");
+        assert t.searchWord("time") == false;
     }
 }
